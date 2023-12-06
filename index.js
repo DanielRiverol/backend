@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(cors());
 
 // Configuración de rutas
-const authRoutes = require('./routes/auth');
-const storeRoutes = require('./routes/stores');
+const authRoutes = require('./src/routes/auth');
+const storeRoutes = require('./src/routes/stores');
 // ... otras rutas
 
 // Conexión a la base de datos MongoDB
