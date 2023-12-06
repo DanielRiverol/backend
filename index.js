@@ -1,39 +1,44 @@
 // app.js
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/tu_basededatos';
+const MONGODB_URI =
+  process.env.MONGODB_URI || "mongodb://localhost:27017/tu_basededatos";
 
 // Configuración de middleware
 app.use(express.json());
 app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Cambia a tu URL de frontend
+    credentials: true,
+  })
+);
 
 // Configuración de rutas
-const authRoutes = require('./src/routes/auth');
-const storeRoutes = require('./src/routes/stores');
+const authRoutes = require("./src/routes/auth");
+const storeRoutes = require("./src/routes/stores");
 // ... otras rutas
 
 // Conexión a la base de datos MongoDB
 mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-     
-  });
-  
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Algo salió mal!');
+  res.status(500).send("Algo salió mal!");
 });
 
 // Rutas
-app.use('/auth', authRoutes);
-app.use('/stores', storeRoutes);
+app.use("/auth", authRoutes);
+app.use("/stores", storeRoutes);
 // ... otras rutas
 
 // Iniciar el servidor
