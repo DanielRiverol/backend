@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
-      userType: req.body.userType || 'cliente',
+      userType: req.body.userType || 'comerciante',
     });
     await user.save();
     res.status(201).send(user);

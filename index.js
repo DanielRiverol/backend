@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors());
 app.use(
   cors({
-    origin:process.env.FRONT_URL, // Cambia a tu URL de frontend
+    origin: process.env.FRONT_URL || "http://localhost:5173", // Cambia a tu URL de frontend
     credentials: true,
   })
 );
