@@ -14,14 +14,9 @@ router.use(
   })
 );
 
-// Crear un nuevo comercio asociado al usuario actual
+
 router.post("/", async (req, res) => {
   try {
-    /* if (!req.session.user) {
-      return res.status(401).send("Usuario no autenticado");
-    } */
-
-    // Obtener el ID del usuario desde el sessionStorage
     const userId = req.session.userId;
 
     // Crear el nuevo store
@@ -39,9 +34,25 @@ router.post("/", async (req, res) => {
 
     // Guardar el store y el usuario actualizado
     await newStore.save();
-   
 
     res.status(201).json(newStore);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+// Otras rutas para obtener todos los stores, etc.
+router.get("/", async (req, res) => {
+  try {
+    let query = {};
+
+    if (req.query.localidad) {
+      query.localidad = { $regex: new RegExp(req.query.localidad, "i") };
+    }
+
+    const stores = await Store.find(query);
+    res.json(stores);
   } catch (error) {
     console.error(error);
     res.status(500).send(error);
