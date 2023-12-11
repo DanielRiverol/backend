@@ -1,90 +1,124 @@
-// routes/stores.js
-const express = require('express');
+const express = require("express");
+const session = require("express-session");
 const router = express.Router();
-const Store = require('../models/Store');
-//const Product = require('../models/Product');
+const Store = require("../models/Store");
+const User = require("../models/User");
 
-// Obtener todos los comercios con opción de filtrar por nombre de producto y/o zona
-router.get('/', async (req, res) => {
+// Configura express-session
+router.use(
+  session({
+    secret: process.env.JWT_SECRET || "tu_secreto_aqui",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Cambia a true si estás usando HTTPS
+  })
+);
+
+// Crear un nuevo comercio asociado al usuario actual
+router.post("/", async (req, res) => {
+  try {
+    /* if (!req.session.user) {
+      return res.status(401).send("Usuario no autenticado");
+    } */
+
+    // Obtener el ID del usuario desde el sessionStorage
+    const userId = req.session.userId;
+
+    // Crear el nuevo store
+    const newStore = new Store({
+      ...req.body,
+      user: userId,
+    });
+
+    // Asociar el store con el usuario
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $set: { store: newStore._id } },
+      { new: true }
+    );
+
+    // Guardar el store y el usuario actualizado
+    await newStore.save();
+   
+
+    res.status(201).json(newStore);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+// Obtener todos los comercios con opción de filtrar por zona y/o tipo de bolsa
+router.get("/", async (req, res) => {
   try {
     let query = {};
 
-    if (req.query.product) {
-      const product = await Product.findOne({ name: req.query.product });
-      if (product) {
-        query._id = product.storeId;
-      } else {
-        return res.status(404).send('Producto no encontrado');
-      }
+    if (req.query.zone) {
+      query.address = { $regex: new RegExp(req.query.zone, "i") };
     }
 
-    if (req.query.zone) {
-      query.zone = req.query.zone;
+    if (req.query.bagType) {
+      query["bags.bagType"] = req.query.bagType;
     }
 
     const stores = await Store.find(query);
     res.json(stores);
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });
 
 // Obtener un comercio específico por ID con opción de filtrar por nombre de producto
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const store = await Store.findById(req.params.id);
     if (!store) {
-      return res.status(404).send('Comercio no encontrado');
+      return res.status(404).send("Comercio no encontrado");
     }
 
-    if (req.query.product) {
-      const product = await Product.findOne({ name: req.query.product, storeId: store._id });
-      if (product) {
-        return res.json({ store, product });
-      } else {
-        return res.status(404).send('Producto no encontrado en este comercio');
-      }
+    if (req.query.bagType) {
+      const bags = store.bags.filter(
+        (bag) => bag.bagType === req.query.bagType
+      );
+      return res.json({ store, bags });
     }
 
     res.json(store);
   } catch (error) {
-    res.status(500).send(error);
-  }
-});
-
-// Crear un nuevo comercio
-router.post('/', async (req, res) => {
-  try {
-    const newStore = new Store(req.body);
-    await newStore.save();
-    res.status(201).json(newStore);
-  } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });
 
 // Actualizar un comercio por ID
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
-    const updatedStore = await Store.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedStore = await Store.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
     if (!updatedStore) {
-      return res.status(404).send('Comercio no encontrado');
+      return res.status(404).send("Comercio no encontrado");
     }
     res.json(updatedStore);
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });
 
 // Eliminar un comercio por ID
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const deletedStore = await Store.findByIdAndDelete(req.params.id);
     if (!deletedStore) {
-      return res.status(404).send('Comercio no encontrado');
+      return res.status(404).send("Comercio no encontrado");
     }
     res.json(deletedStore);
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });

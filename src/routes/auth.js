@@ -36,8 +36,8 @@ router.post('/login', async (req, res) => {
     }
     // Generar token JWT
     const token = jwt.sign({ _id: user._id }, secret);
-    res.header('Authorization', `Bearer ${token}`).send(token);
-   
+    //res.header('Authorization', `Bearer ${token}`).send(token);
+    res.status(200).json({ token, user });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -65,5 +65,4 @@ router.post('/change-password', async (req, res) => {
     res.status(500).send(error);
   }
 });
-
 module.exports = router;

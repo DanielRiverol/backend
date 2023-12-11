@@ -22,6 +22,8 @@ app.use(
 // Configuración de rutas
 const authRoutes = require("./src/routes/auth");
 const storeRoutes = require("./src/routes/stores");
+const userRoutes = require("./src/routes/users");
+const bagRoutes = require("./src/routes/bags");
 // ... otras rutas
 
 // Conexión a la base de datos MongoDB
@@ -39,6 +41,7 @@ app.use((err, req, res, next) => {
 // Rutas
 app.use("/auth", authRoutes);
 app.use("/stores", storeRoutes);
+app.use("/user", userRoutes);
 // ... otras rutas
 
 // Iniciar el servidor
