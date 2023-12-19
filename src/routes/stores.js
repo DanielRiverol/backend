@@ -18,7 +18,7 @@ router.use(
 router.post("/", async (req, res) => {
   try {
     const userId = req.session.userId;
-
+console.log(userId);
     // Crear el nuevo store
     const newStore = new Store({
       ...req.body,

@@ -25,7 +25,9 @@ router.post('/register', async (req, res) => {
 
 // Inicio de sesión
 router.post('/login', async (req, res) => {
+
   try {
+    
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(404).send('Usuario no encontrado');
@@ -36,9 +38,11 @@ router.post('/login', async (req, res) => {
     }
     // Generar token JWT
     const token = jwt.sign({ _id: user._id }, secret);
+    
     //res.header('Authorization', `Bearer ${token}`).send(token);
     res.status(200).json({ token, user });
   } catch (error) {
+    console.log(error)
     res.status(500).send(error);
   }
 });
