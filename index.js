@@ -46,6 +46,6 @@ app.use("/user", userRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {
-  console.log("Iniciando servidor...")
+  console.log("Estado del servidor: OK")
   console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });
