@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const router = express.Router();
-const secret= process.env.JWT_SECRET || "tu_secreto"
+const secret= "tu_secreto"
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
